@@ -39,7 +39,6 @@ from watch_list.models import WatchList, StreamingPlatform
     
 #model serializers
 class WatchListSerializer(serializers.ModelSerializer):
-    len_name = serializers.SerializerMethodField()
     class Meta:
         model = WatchList
         fields = '__all__'

@@ -70,7 +70,6 @@ class WatchDetailAV(APIView):
 
 
 class StreamingPlatformAV(APIView):
-    
     def get(self, request):
         platform = StreamingPlatform.objects.all()
         serializer = StreamingPlatformSerializer(platform, many=True)
@@ -83,3 +82,26 @@ class StreamingPlatformAV(APIView):
             return Response(serializer.data)
         return Response(serializer.errors)
     
+
+class StreamingPlatformDetailAV(APIView):
+    def get(self, request, pk):
+        try:
+            platform = StreamingPlatform.objects.get(id=pk)
+        except StreamingPlatform.DoesNotExist:
+            return Response({'error': 'Streaming Platform not found'}, status=404)
+        serializer = StreamingPlatformSerializer(platform)
+        return Response(serializer.data)
+    
+    def put(self, request, pk):
+        platform = StreamingPlatform.objects.get(id=pk)
+        serializer = StreamingPlatformSerializer(instance=platform, data=request.data)
+        
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors)
+    
+    def delete(self, request, pk):
+        platform = StreamingPlatform.objects.get(id=pk)
+        platform.delete()
+        return Response('Item Deleted')
