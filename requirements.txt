@@ -1,0 +1,12 @@
+ /**
+
+ lists all the packages and dependencies needed to run your Django project. 
+ This way, other developers can create their own virtual environment and install
+ the necessary packages using the.
+ -pip install -r requirements.txt command.
+ 
+ activate your virtual environment and run the following command:
+
+ -pip freeze > requirements.txt
+
+**/
