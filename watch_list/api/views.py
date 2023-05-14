@@ -1,40 +1,85 @@
-from django.shortcuts import render
-from django.http import JsonResponse
-from rest_framework.decorators import api_view
-from watch_list.api.serializers import Movie
+from watch_list.api.serializers import WatchListSerializer, StreamingPlatformSerializer
+from watch_list.models import WatchList, StreamingPlatform
+from rest_framework.views import APIView
+from rest_framework.response import Response
 
 # Create your views here.
-
+# @api_view(['GET', 'POST'])
 # def movie_list(request):
 #     movies = Movie.objects.all()
+#     seriliazer = MovieSerializer(movies, many=True)
+#     return Response(seriliazer.data)
+
+
+# @api_view()
+# def movie_detail(request, pk):
+#     movie = Movie.objects.get(id=pk)
 #     data = {
-#         'movies': list(movies.values())
+#         'movie': {
+#             'name': movie.name,
+#             'description': movie.description,
+#             'active': movie.active
+#         }
 #     }
 
 #     return JsonResponse(data)
-
-
-@api_view()
-def movie_list(request):
-    movies = Movie.objects.all()
-    data = {
-        'movies': list(movies.values())
-    }
-
-    return JsonResponse(data)
-
-
-@api_view()
-def movie_detail(request, pk):
-    movie = Movie.objects.get(id=pk)
-    data = {
-        'movie': {
-            'name': movie.name,
-            'description': movie.description,
-            'active': movie.active
-        }
-    }
-
-    return JsonResponse(data)
     
    
+class WatchListAV(APIView):
+    def get(self, request):
+        movies = WatchList.objects.all()
+        seriliazer = WatchListSerializer(movies, many=True) #when we have many objects we need to pass many=True
+        return Response(seriliazer.data)
+    
+    def post(self, request):
+        seriliazer = WatchListSerializer(data=request.data)
+        if seriliazer.is_valid():
+            seriliazer.save()
+            return Response(seriliazer.data)
+        return Response(seriliazer.errors)
+    
+    
+    
+class WatchDetailAV(APIView):
+    def get(self, request, pk):
+      try: 
+        movie = WatchList.objects.get(id=pk)
+      except WatchList.DoesNotExist:
+        return Response({'error': 'Movie not found'}, status=404)
+      
+      seriliazer = WatchListSerializer(movie)
+      return Response(seriliazer.data)
+    
+    
+    def put(self, request, pk):
+        movie = WatchList.objects.get(id=pk)
+        seriliazer = WatchListSerializer(instance=movie, data=request.data)
+
+        if seriliazer.is_valid():
+            seriliazer.save()
+            return Response(seriliazer.data)
+        return Response(seriliazer.errors)
+    
+    
+    
+    def delete(self, request, pk):
+        movie = WatchList.objects.get(id=pk)
+        movie.delete()
+        return Response('Item Deleted')
+     
+
+
+class StreamingPlatformAV(APIView):
+    
+    def get(self, request):
+        platform = StreamingPlatform.objects.all()
+        serializer = StreamingPlatformSerializer(platform, many=True)
+        return Response(serializer.data)
+    
+    def post(self, request):
+        serializer = StreamingPlatformSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors)
+    
