@@ -2,6 +2,12 @@ from watch_list.api.serializers import WatchListSerializer, StreamingPlatformSer
 from watch_list.models import WatchList, StreamingPlatform
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework import status
+from rest_framework import generics
+from rest_framework import mixins
+from rest_framework import viewsets
+from watch_list.api.serializers import ReviewSerializer
+from watch_list.models import Review
 
 # Create your views here.
 # @api_view(['GET', 'POST'])
@@ -24,6 +30,42 @@ from rest_framework.response import Response
 
 #     return JsonResponse(data)
     
+
+
+# class ReviewDetails(mixins.RetrieveModelMixin, generics.GenericAPIView):
+#     queryset = Review.objects.all() 
+#     serializer_class = ReviewSerializer
+
+#     def get(self, request, *args, **kwargs):
+#         return self.retrieve(request, *args, **kwargs)
+    
+
+# Review geting, and create a new using mixins and generics views
+# class ReviewList(mixins.ListModelMixin, mixins.CreateModelMixin,generics.GenericAPIView):
+#     queryset = Review.objects.all() 
+#     serializer_class = ReviewSerializer
+
+#     def get(self, request, *args, **kwargs):
+#         return self.list(request, *args, **kwargs)
+    
+#     def post(self, request, *args, **kwargs):
+#         return self.create(request, *args, **kwargs)
+
+
+
+
+class ReviewList(generics.ListCreateAPIView):
+    queryset = Review.objects.all() 
+    serializer_class = ReviewSerializer
+
+
+
+class ReviewDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Review.objects.all() 
+    serializer_class = ReviewSerializer
+
+
+
    
 class WatchListAV(APIView):
     def get(self, request):
@@ -39,7 +81,6 @@ class WatchListAV(APIView):
         return Response(seriliazer.errors)
     
     
-    
 class WatchDetailAV(APIView):
     def get(self, request, pk):
       try: 
@@ -50,7 +91,6 @@ class WatchDetailAV(APIView):
       seriliazer = WatchListSerializer(movie)
       return Response(seriliazer.data)
     
-    
     def put(self, request, pk):
         movie = WatchList.objects.get(id=pk)
         seriliazer = WatchListSerializer(instance=movie, data=request.data)
@@ -60,19 +100,17 @@ class WatchDetailAV(APIView):
             return Response(seriliazer.data)
         return Response(seriliazer.errors)
     
-    
-    
     def delete(self, request, pk):
         movie = WatchList.objects.get(id=pk)
         movie.delete()
         return Response('Item Deleted')
-     
 
 
 class StreamingPlatformAV(APIView):
     def get(self, request):
         platform = StreamingPlatform.objects.all()
-        serializer = StreamingPlatformSerializer(platform, many=True)
+        # context is used for HyperlinkedRelatedField
+        serializer = StreamingPlatformSerializer(platform, many=True, context={'request': request}) 
         return Response(serializer.data)
     
     def post(self, request):

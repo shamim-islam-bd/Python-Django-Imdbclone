@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from watch_list.models import WatchList, StreamingPlatform
+from watch_list.models import WatchList, StreamingPlatform, Review
 
 # Create your models here.
 
@@ -37,8 +37,20 @@ from watch_list.models import WatchList, StreamingPlatform
 #             raise serializers.ValidationError('Description is too short')
 #         return value
     
+
+# Review Serializer
+class ReviewSerializer(serializers.ModelSerializer):
+   
+    class Meta:
+        model = Review
+        fields = '__all__'
+
+
+
 #model serializers
 class WatchListSerializer(serializers.ModelSerializer):
+    reviews = ReviewSerializer(many=True, read_only=True)
+
     class Meta:
         model = WatchList
         fields = '__all__'
@@ -46,10 +58,21 @@ class WatchListSerializer(serializers.ModelSerializer):
         # exclude = ['active']
     
 
+
+# class StreamingPlatformSerializer(serializers.HyperlinkedModelSerializer):
 class StreamingPlatformSerializer(serializers.ModelSerializer):
+    # watchlist = WatchListSerializer(many=True, read_only=True)  # watchlist movies will store in streaming 
+                                                                # watchlist name has to be same as watchlist foreignkey related_name
+    # watchlist = serializers.StringRelatedField(many=True)       # stringRelatedField used for showing only string related fields.
+   
+    watchlist = serializers.HyperlinkedRelatedField(
+        many=True,
+        read_only=True,
+        view_name="watch_detail"
+    )
+   
     class Meta:
         model = StreamingPlatform
         fields = '__all__'
-        # fields = ['id', 'name', 'description', 'active']
-        # exclude = ['active']
+
 
