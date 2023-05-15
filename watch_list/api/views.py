@@ -10,27 +10,6 @@ from watch_list.api.serializers import ReviewSerializer
 from watch_list.models import Review
 
 # Create your views here.
-# @api_view(['GET', 'POST'])
-# def movie_list(request):
-#     movies = Movie.objects.all()
-#     seriliazer = MovieSerializer(movies, many=True)
-#     return Response(seriliazer.data)
-
-
-# @api_view()
-# def movie_detail(request, pk):
-#     movie = Movie.objects.get(id=pk)
-#     data = {
-#         'movie': {
-#             'name': movie.name,
-#             'description': movie.description,
-#             'active': movie.active
-#         }
-#     }
-
-#     return JsonResponse(data)
-    
-
 
 # class ReviewDetails(mixins.RetrieveModelMixin, generics.GenericAPIView):
 #     queryset = Review.objects.all() 
@@ -54,9 +33,23 @@ from watch_list.models import Review
 
 
 
-class ReviewList(generics.ListCreateAPIView):
-    queryset = Review.objects.all() 
+class ReviewList(generics.ListAPIView):
+    # queryset = Review.objects.all() 
     serializer_class = ReviewSerializer
+
+    def get_queryset(self):
+        pk = self.kwargs['pk']
+        return Review.objects.filter(watchlist=pk)
+    
+
+class ReviewCreate(generics.CreateAPIView):
+    serializer_class = ReviewSerializer
+
+    def perform_create(self, serializer):
+        pk = self.kwargs['pk']
+        watchlist = WatchList.objects.get(pk=pk)
+        serializer.save(watchlist=watchlist)
+
 
 
 
