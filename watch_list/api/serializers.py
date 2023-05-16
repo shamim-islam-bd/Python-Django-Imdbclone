@@ -40,7 +40,8 @@ from watch_list.models import WatchList, StreamingPlatform, Review
 
 # Review Serializer
 class ReviewSerializer(serializers.ModelSerializer):
-   
+    review_user = serializers.StringRelatedField(read_only=True)
+
     class Meta:
         model = Review
         exclude = ['watchlist']
@@ -62,15 +63,15 @@ class WatchListSerializer(serializers.ModelSerializer):
 
 # class StreamingPlatformSerializer(serializers.HyperlinkedModelSerializer):
 class StreamingPlatformSerializer(serializers.ModelSerializer):
-    # watchlist = WatchListSerializer(many=True, read_only=True)  # watchlist movies will store in streaming 
+    watchlist = WatchListSerializer(many=True, read_only=True)  # watchlist movies will store in streaming 
                                                                 # watchlist name has to be same as watchlist foreignkey related_name
     # watchlist = serializers.StringRelatedField(many=True)       # stringRelatedField used for showing only string related fields.
    
-    watchlist = serializers.HyperlinkedRelatedField(
-        many=True,
-        read_only=True,
-        view_name="watch_detail"
-    )
+    # watchlist = serializers.HyperlinkedRelatedField(
+    #     many=True,
+    #     read_only=True,
+    #     view_name="watch_detail"
+    # )
    
     class Meta:
         model = StreamingPlatform
